@@ -116,62 +116,7 @@ public class PlayingMusicActivity extends AppCompatActivity {
             }
         });
 
-        updateSeekBar = new Thread(){
-            @Override
-            public void run() {
-                int totalDuration = mediaPlayer.getDuration();
-                int currPos=0;
-                while(currPos<totalDuration){
-                    try {
-                        sleep(500);
-                        currPos = mediaPlayer.getCurrentPosition();
-                        seekMusicBar.setProgress(currPos);
-                    }catch (InterruptedException | IllegalStateException e){
-                        e.printStackTrace();
-                    }
-                }
-            }
-        };
-
-        seekMusicBar.setMax(mediaPlayer.getDuration());
-        updateSeekBar.start();
-        seekMusicBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.purple_700), PorterDuff.Mode.MULTIPLY);
-        seekMusicBar.getThumb().setColorFilter(getResources().getColor(R.color.purple_700),PorterDuff.Mode.SRC_IN);
-
-        seekMusicBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-                mediaPlayer.seekTo(seekBar.getProgress());
-            }
-        });
-
-        String endTime = createTime(mediaPlayer.getDuration());
-        txtSongEnd.setText(endTime);
-
-        final Handler handler = new Handler();
-        final int delay=1000;
-
-        handler.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                String currTime = createTime(mediaPlayer.getCurrentPosition());
-                if(currTime.equals(endTime)||(mediaPlayer.getCurrentPosition()>=mediaPlayer.getDuration())){
-                    btnNext.performClick();
-                }
-                txtSongStart.setText(currTime);
-                handler.postDelayed(this,delay);
-            }
-        },delay);
+        seekBarAnimation();
 
         btnPlay.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -212,8 +157,7 @@ public class PlayingMusicActivity extends AppCompatActivity {
                 mediaPlayer.start();
 
                 startAnimation(imageView,360f);
-                mediaPlayer.seekTo(0);
-                mediaPlayer.seekTo(0);
+                seekBarAnimation();
                 setVisualizer();
             }
         });
@@ -280,6 +224,67 @@ public class PlayingMusicActivity extends AppCompatActivity {
         if(audioSessionId != -1){
             barVisualizer.setAudioSessionId(audioSessionId);
         }
+    }
+
+    public void seekBarAnimation(){
+        updateSeekBar = new Thread(){
+            @Override
+            public void run() {
+                int totalDuration = mediaPlayer.getDuration();
+                int currPos=0;
+                while(currPos<totalDuration){
+                    try {
+                        sleep(500);
+                        currPos = mediaPlayer.getCurrentPosition();
+                        seekMusicBar.setProgress(currPos);
+                    }catch (InterruptedException | IllegalStateException e){
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+
+        seekMusicBar.setMax(mediaPlayer.getDuration());
+        updateSeekBar.start();
+        seekMusicBar.getProgressDrawable().setColorFilter(getResources().getColor(R.color.purple_700), PorterDuff.Mode.MULTIPLY);
+        seekMusicBar.getThumb().setColorFilter(getResources().getColor(R.color.purple_700),PorterDuff.Mode.SRC_IN);
+
+        seekMusicBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+                mediaPlayer.seekTo(seekBar.getProgress());
+            }
+        });
+
+        String endTime = createTime(mediaPlayer.getDuration());
+        txtSongEnd.setText(endTime);
+
+        final Handler handler = new Handler();
+        final int delay=1000;
+
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                String currTime = createTime(mediaPlayer.getCurrentPosition());
+                if(currTime.equals(endTime)||(mediaPlayer.getCurrentPosition()>=mediaPlayer.getDuration())){
+                    btnNext.performClick();
+                    seekMusicBar.setProgress(0);
+                    handler.postDelayed(this,delay);
+                }
+                txtSongStart.setText(currTime);
+                handler.postDelayed(this,delay);
+            }
+        },delay);
     }
 
 }

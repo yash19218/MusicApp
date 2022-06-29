@@ -66,12 +66,12 @@ public class MainActivity extends AppCompatActivity {
     public ArrayList<File> findSong(File file){
         ArrayList<File> arrList = new ArrayList<>();
         File[] files = file.listFiles();
-        assert files != null;
+
         for(File f:files){
             if(f.isDirectory() && !f.isHidden()){
                 arrList.addAll(findSong(f));
             }else{
-                if(f.getName().endsWith(".mp3") || f.getName().endsWith(".wav")){
+                if(f.getName().endsWith(".mp3") || f.getName().endsWith(".wav") || f.getName().endsWith(".m4a")){
                     arrList.add(f);
                 }
             }
